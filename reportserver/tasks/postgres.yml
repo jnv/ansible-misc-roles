@@ -1,0 +1,32 @@
+---
+
+
+- name: create db user
+  postgresql_user:
+    name: '{{reportserver_db_user}}'
+    password: '{{reportserver_db_password}}'
+    state: present
+
+- name: create db
+  postgresql_db:
+    name: '{{reportserver_db_name}}'
+    encoding: 'UTF-8'
+    state: present
+    owner: '{{reportserver_db_user}}'
+
+# - name: grant permissions to db
+#   postgresql_privs:
+#     database: '{{reportserver_db_name}}'
+#     state: present
+#     privs: ALL
+#     type: database
+#     roles: '{{reportserver_db_user}}'
+
+- name: setup database schema
+  sudo: yes
+  sudo_user: postgres
+  shell: "psql --user={{reportserver_db_user}} {{reportserver_db_name}} < {{reportserver_dir}}/ddl/{{reportserver_ddl_file}}"
+  register: reportserver_psql_result
+  failed_when: >
+    (reportserver_psql_result.rc != 0) or ("ERROR" in reportserver_psql_result.stderr)
+  changed_when: "reportserver_psql_result.rc == 0"

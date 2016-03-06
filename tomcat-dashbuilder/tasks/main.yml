@@ -1,0 +1,11 @@
+---
+# tasks file for dashbuilder
+- include: install.yml
+- include: postgresql.yml
+
+- name: setup dashbuilder's context
+  template:
+    src: context.xml.j2
+    dest: "/var/lib/tomcat7/conf/Catalina/localhost/dashbuilder.xml"
+    owner: "{{tomcat_owner}}"
+    group: "{{tomcat_group}}"

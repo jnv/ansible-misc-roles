@@ -1,0 +1,17 @@
+---
+- name: register Dashbuilder facts
+  set_fact:
+    dashbuilder_war_path: "{{tomcat_webapps_dir}}/dashbuilder.war"
+    dashbuilder_url: "{{tomcat_url}}/dashbuilder"
+
+- name: download Dashbuilder's war
+  get_url:
+    url: "{{dashbuilder_war_url}}"
+    dest: "{{dashbuilder_war_path}}"
+
+- name: verify Dashbuilder war permissions
+  file:
+    path: "{{dashbuilder_war_path}}"
+    owner: "{{tomcat_owner}}"
+    group: "{{tomcat_group}}"
+    mode: "0664"

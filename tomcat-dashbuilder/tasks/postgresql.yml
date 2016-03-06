@@ -1,0 +1,13 @@
+---
+- name: install JDBC driver for PostgreSQL
+  apt:
+    name: libpostgresql-jdbc-java
+    state: present
+
+# FIXME: This should rather be only in app's configured classpath
+- name: symlink JDBC driver to Tomcat's lib dir
+  file:
+    state: link
+    src: /usr/share/java/postgresql.jar
+    follow: yes
+    dest: "{{tomcat_lib_dir}}/postgresql.jar"

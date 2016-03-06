@@ -1,0 +1,39 @@
+---
+- name: Download redash archive
+  get_url:
+    url: "{{redash_download_url}}"
+    dest: "/tmp/redash.tar.gz"
+
+- name: Create target version directory
+  file:
+    path: "{{redash_version_path}}"
+    state: directory
+    owner: "{{redash_user}}"
+    group: "{{redash_group}}"
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: Extract Redash
+  unarchive:
+    src: "/tmp/redash.tar.gz"
+    dest: "{{redash_version_path}}"
+    copy: false
+    owner: "{{redash_user}}"
+    group: "{{redash_group}}"
+
+- name: Remove Redash archive
+  file:
+    state: absent
+    path: /tmp/redash.tar.gz
+
+- name: Link current dir to current version
+  file:
+    state: link
+    src: "{{redash_version_path}}"
+    dest: "{{redash_current_path}}"
+    force: yes
+
+- name: Link .env file to current version
+  file:
+    state: link
+    src: "{{redash_base_path}}/.env"
+    dest: "{{redash_current_path}}/.env"

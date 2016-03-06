@@ -1,0 +1,10 @@
+---
+# names
+app_name: "cloudwok"
+# environment vars: "dev", "test" or "prod"
+env: "dev"
+# deployment
+deployment: "webserver"
+
+# war file
+s3_war_file_bucket: "{{app_name}}-{{deployment}}"

@@ -1,0 +1,72 @@
+---
+- name: Install preliminary dependencies
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - python-pip
+    - python-dev
+
+- name: Setup Redash group
+  group:
+    name: "{{redash_group}}"
+    system: yes
+    state: present
+
+- name: Setup Redash user account
+  user:
+    name: "{{redash_user}}"
+    group: "{{redash_group}}"
+    system: yes
+    home: "{{redash_base_path}}"
+    state: present
+
+- name: Setup directories
+  file:
+    path: "{{item}}"
+    owner: "{{redash_user}}"
+    group: "{{redash_group}}"
+    mode: "u=rwx,g=rwx,o=rx"
+    state: directory
+  with_items:
+    - "{{redash_base_path}}"
+    - "{{redash_logs_path}}"
+
+- name: Setup .env file
+  template:
+    src: env.j2
+    dest: "{{redash_base_path}}/.env"
+    owner: "{{redash_user}}"
+    group: "{{redash_group}}"
+    mode: "u=rwx,g=rwx,o="
+
+
+- name: Check if the initial setup has been finished
+  stat:
+    path: "{{redash_base_path}}/installed"
+  register: redash_installed_stat
+- set_fact:
+    redash_setup: false
+  when: p_dir_stat.stat.exists is defined and p_dir_stat.stat.exists
+
+- name: Check if current version exists
+  stat:
+    path: "{{redash_version_path}}"
+  register: redash_dir_stat
+
+- name: Download and extract Redash
+  include: download.yml
+  when: not redash_dir_stat.stat.exists
+
+- name: Install pip dependencies
+  pip:
+    requirements: "{{redash_current_path}}/requirements.txt"
+
+- name: Setup metadata database
+  include: db.yml
+
+- name: Setup supervisor
+  include: supervisor.yml
+
+- name: Manage users and datasources
+  include: manage.yml

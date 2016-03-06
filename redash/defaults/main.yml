@@ -1,0 +1,71 @@
+---
+# defaults file for redash
+redash_release: 0.9.1.b1377
+redash_version: 0.9.1.b1377
+
+redash_download_url: "https://github.com/EverythingMe/redash/releases/download/v{{redash_release}}/redash.{{redash_version}}.tar.gz"
+redash_user: redash
+redash_group: redash
+
+redash_base_path: /opt/redash
+redash_version_path: "{{redash_base_path}}/redash.{{redash_version}}"
+redash_current_path: "{{redash_base_path}}/current"
+redash_logs_path: "/var/log/redash"
+redash_supervisor_conf_file: "/etc/supervisor/conf.d/redash.conf"
+
+redash_celery_concurrency: 2
+redash_celery_scheduled_concurrency: 2
+
+redash_pg_user: redash
+redash_pg_db: redash
+redash_pg_reader_user: redash_reader
+
+redash_setup: True
+
+redash_redis_url: redis://localhost:6379/1
+#redash_cookie_secret:
+redash_google_apps_domain: ""
+redash_workers_count: 2
+
+redash_gunicorn_bind: 127.0.0.1:5000
+redash_gunicorn_workers: 4
+
+redash_admin_password: admin
+
+# redash_enabled_query_runners:
+#   - redash.query_runner.big_query
+#   - redash.query_runner.graphite
+#   - redash.query_runner.mongodb
+#   - redash.query_runner.mysql
+#   - redash.query_runner.pg
+#   - redash.query_runner.script
+#   - redash.query_runner.url
+
+redash_admin_users:
+  - name: admin
+    email: admin
+    password: "{{redash_admin_password}}"
+
+redash_users: {}
+# redash_users:
+#   - name: user
+#     email: user@example.com
+#     password: supersecretpwd
+
+# List of e-mails of users to remove
+redash_absent_users: []
+# redash_absent_users:
+#   - user@example.com
+
+redash_datasources: {}
+# redash_datasources:
+#   - name: mydatasource
+#     type: pg
+#     options:
+#       user: db_user
+#       host: localhost
+#       dbname: db_name
+#       password: db_pass
+
+redash_absent_datasources: []
+#redash_absent_datasources: [mydatasource]

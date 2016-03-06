@@ -1,0 +1,4 @@
+---
+# defaults file for openjdk
+openjdk_version: 7
+openjdk_package: "openjdk-{{openjdk_version}}-jre-headless"

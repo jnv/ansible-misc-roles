@@ -1,0 +1,14 @@
+---
+- name: Install supervisor
+  apt:
+    name: supervisor
+    state: present
+
+- name: Setup supervisor config
+  template:
+    src: supervisor.j2
+    dest: "{{redash_supervisor_conf_file}}"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify: restart supervisor

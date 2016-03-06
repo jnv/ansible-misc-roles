@@ -1,0 +1,9 @@
+---
+# vars file for redash
+redash_manage_script: "cd {{redash_current_path}}; sudo -u {{redash_user}} bin/run ./manage.py"
+
+redash_ds_metadata:
+  user: "{{redash_pg_reader_user}}"
+  password: "{{redash_pg_reader_password}}"
+  host: localhost
+  dbname: "{{redash_pg_db}}"

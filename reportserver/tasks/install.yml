@@ -1,0 +1,41 @@
+---
+- name: download ReportServer archiver
+  get_url:
+    url: "{{reportserver_zip_url}}"
+    dest: "{{reportserver_tmp}}"
+
+- name: prepare extraction directory
+  file:
+    state: directory
+    path: "{{reportserver_dir}}"
+    owner: "{{reportserver_owner}}"
+    group: "{{reportserver_group}}"
+
+- name: extract ReportServer
+  unarchive:
+    src: "{{reportserver_tmp}}"
+    dest: "{{reportserver_dir}}"
+    copy: false
+    owner: "{{reportserver_owner}}"
+    group: "{{reportserver_group}}"
+
+- name: Change ownership of ReportServer installation
+  file:
+    path: "{{reportserver_dir}}"
+    owner: "{{tomcat_owner}}"
+    group: "{{tomcat_group}}"
+    state: directory
+    recurse: yes
+
+- include: postgres.yml
+
+- name: touch 'installed' file
+  file:
+    path: "{{reportserver_dir}}/installed"
+    state: touch
+
+- name: remove ReportServer archive
+  file:
+    state: absent
+    path: '{{reportserver_tmp}}'
+  when: 'reportserver_remove_tmp == True'

@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+export JAVA_OPTS="-Djava.awt.headless=true -Xms{{tomcat_initial_memory}} -Xmx{{tomcat_maximum_memory}} -XX:+UseConcMarkSweepGC"
+export CATALINA_OPTS="-Dcom.sun.management.jmxremote
+{% if not tomcat_jmx_use_fixed_port %}-Dcom.sun.management.jmxremote.port={{tomcat_jmx_registry_port}} {% endif %}
+  -Dcom.sun.management.jmxremote.local.only=false
+  -Dcom.sun.management.jmxremote.ssl=false
+  -Djava.rmi.server.hostname={{tomcat_jmx_bind_id}}
+  -Dcom.sun.management.jmxremote.authenticate={{tomcat_jmx_authenticate}}
+ {% if tomcat_jmx_authenticate == true %}-Dcom.sun.management.jmxremote.password.file=$CATALINA_BASE/conf/jmxremote.password
+  -Dcom.sun.management.jmxremote.access.file=$CATALINA_BASE/conf/jmxremote.access{% endif %}"
+

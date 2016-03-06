@@ -1,0 +1,35 @@
+---
+ - name: ensure tomcat6-extras is installed
+   apt:  pkg=tomcat6-extras state={{tomcat_pkg_state}}
+   when: ansible_os_family == 'Debian'
+   when: tomcat_version == 6
+   tags: [packages,tomcat]
+
+ - name: check tomcat version
+   shell: '{{tomcat_home_dir}}/bin/version.sh | /bin/grep "Server number" | /bin/grep -o "7\.[0-9]*\.[0-9]*"'
+   register: tomcat_exact_version
+   ignore_errors: True
+   changed_when: "tomcat_exact_version.rc == 1"
+   when: tomcat_version != 6
+   tags: [packages,tomcat]
+
+ - name: ensure catalina-jmx-remote.jar is installed
+   get_url: url=http://archive.apache.org/dist/tomcat/tomcat-7/v{{tomcat_exact_version.stdout}}/bin/extras/catalina-jmx-remote.jar dest={{tomcat_home_dir}}/lib/catalina-jmx-remote.jar mode=0444
+   when: tomcat_version != 6
+   tags: [packages,tomcat]
+
+ - name: ensure jmx are configured for tomcat
+   template: src={{item.src}} dest=/usr/share/tomcat{{tomcat_version}}/bin/{{item.dest}} mode=0755 owner={{tomcat_owner}} group={{tomcat_group}}
+   notify: restart tomcat
+   with_items:
+     - { src: "setenv.sh.j2", dest: "setenv.sh"}
+   tags: [configuration,tomcat]
+
+ - name: ensure jmx authentification are configured for tomcat
+   template: src={{item.src}} dest={{tomcat_conf_dir}}/{{item.dest}} mode=0600 owner={{tomcat_owner}} group={{tomcat_group}}
+   notify: restart tomcat
+   with_items:
+     - { src: "jmxremote.access.j2", dest: "jmxremote.access"}
+     - { src: "jmxremote.password.j2", dest: "jmxremote.password"}
+   when: tomcat_jmx_authenticate == true
+   tags: [configuration,tomcat]

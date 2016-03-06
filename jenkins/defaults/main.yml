@@ -1,0 +1,20 @@
+---
+jenkins_name: jenkins
+jenkins_home: "/var/lib/{{jenkins_name}}"
+jenkins_war: "/usr/share/{{jenkins_name}}/{{jenkins_name}}.war"
+jenkins_user: "{{jenkins_name}}"
+jenkins_group: "{{jenkins_name}}"
+jenkins_groups: ""
+jenkins_hostname: localhost
+jenkins_http_port: "8080"
+jenkins_java: "/usr/bin/java"
+jenkins_java_args: "-Djava.awt.headless=true"
+jenkins_connection_delay: 5
+jenkins_connection_retries: 60
+jenkins_jar_location: /opt/jenkins-cli.jar
+jenkins_url: "http://{{jenkins_hostname}}:{{jenkins_http_port}}"
+jenkins_plugins_present:
+  - git
+  - sonar
+  - ssh
+jenkins_plugins_disabled: []

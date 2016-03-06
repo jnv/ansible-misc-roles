@@ -1,0 +1,38 @@
+[program:redash_server]
+command={{redash_current_path}}/bin/run gunicorn -b {{redash_gunicorn_bind}} --name redash -w {{redash_gunicorn_workers}} redash.wsgi:app
+process_name=redash_server
+numprocs=1
+priority=999
+autostart=true
+autorestart=true
+directory={{redash_current_path}}
+stdout_logfile={{redash_logs_path}}/api.log
+stderr_logfile={{redash_logs_path}}/api_error.log
+user={{redash_user}}
+# There are two queue types here: one for ad-hoc queries, and one for the refresh of scheduled queries
+# (note that "scheduled_queries" appears only in the queue list of "redash_celery_scheduled").
+# The default concurrency level for each is 2 (-c2), you can increase based on your machine's resources.
+
+[program:redash_celery]
+command={{redash_current_path}}/bin/run celery worker --app=redash.worker --beat -c{{redash_celery_concurrency}} -Qqueries,celery
+process_name=redash_celery
+numprocs=1
+priority=999
+autostart=true
+autorestart=true
+directory={{redash_current_path}}
+stdout_logfile={{redash_logs_path}}/celery.log
+stderr_logfile={{redash_logs_path}}/celery_error.log
+user={{redash_user}}
+
+[program:redash_celery_scheduled]
+command={{redash_current_path}}/bin/run celery worker --app=redash.worker -c{{redash_celery_scheduled_concurrency}} -Qscheduled_queries
+process_name=redash_celery_scheduled
+numprocs=1
+priority=999
+autostart=true
+autorestart=true
+directory={{redash_current_path}}
+stdout_logfile={{redash_logs_path}}/celery.log
+stderr_logfile={{redash_logs_path}}/celery_error.log
+user={{redash_user}}

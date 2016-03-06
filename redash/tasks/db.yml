@@ -1,0 +1,56 @@
+---
+# Based On https://github.com/getredash/redash/blob/master/setup/ubuntu/bootstrap.sh
+- name: Create DB user
+  sudo: yes
+  postgresql_user:
+    name: "{{redash_pg_user}}"
+    role_attr_flags: "NOSUPERUSER,NOCREATEDB,NOCREATEROLE"
+    state: present
+
+- name: Create database
+  sudo: yes
+  postgresql_db:
+    name: "{{redash_pg_db}}"
+    owner: "{{redash_pg_user}}"
+    encoding: "UTF-8"
+    state: present
+  register: redash_create_pg_db
+
+- name: Setup database schema
+  shell: "{{redash_manage_script}} database create_tables"
+  when: redash_create_pg_db.changed
+
+- name: Create DB reader user
+  postgresql_user:
+    name: "{{redash_pg_reader_user}}"
+    password: "{{redash_pg_reader_password}}"
+    role_attr_flags: "NOSUPERUSER,NOCREATEDB,NOCREATEROLE,LOGIN"
+    state: present
+    db: "{{redash_pg_db}}"
+  register: redash_create_pg_reader
+
+## FIXME: ansible/ansible-modules-core#1120
+# - name: Grant privileges to data_sources for DB reader user
+#   sudo: yes
+#   postgresql_privs:
+#     database: "{{redash_pg_db}}"
+#     roles: "{{redash_pg_reader_user}}"
+#     privs: "SELECT(id,name,type)"
+#     objs: "data_sources"
+- name: Grant privileges to data_sources and users for DB reader user
+  sudo_user: "{{redash_user}}"
+  sudo: yes
+  shell: 'psql -c "GRANT SELECT(id,name,type) ON data_sources to {{redash_pg_reader_user}};grant select(id,name) ON users to {{redash_pg_reader_user}};" {{redash_pg_db}}'
+  when: redash_create_pg_reader.changed
+
+- name: Grant privileges to other tables for DB reader user
+  sudo: yes
+  postgresql_privs:
+    database: "{{redash_pg_db}}"
+    roles: "{{redash_pg_reader_user}}"
+    privs: "select"
+    objs: "events,queries,dashboards,widgets,visualizations,query_results"
+
+- name: Setup reader data source
+  shell: '{{redash_manage_script}} ds new -n "re:dash metadata" -t "pg" -o ''{{redash_ds_metadata | to_json}}'''
+  when: redash_create_pg_reader.changed

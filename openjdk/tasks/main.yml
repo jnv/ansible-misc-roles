@@ -1,0 +1,6 @@
+---
+# tasks file for openjdk
+- name: Install OpenJDK packages
+  apt:
+    name: "{{openjdk_package}}"
+    state: present

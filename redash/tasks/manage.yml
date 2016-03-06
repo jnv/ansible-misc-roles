@@ -1,0 +1,26 @@
+---
+- name: Setup redash admin
+  shell: '{{redash_manage_script}} users create --admin --password "{{redash_admin_password}}" "admin" "admin"'
+  when: redash_create_pg_db.changed
+
+- name: Remove users
+  shell: '{{redash_manage_script}} users delete {{item}}'
+  with_items: redash_absent_users
+
+- name: Add admin users
+  shell: '{{redash_manage_script}} users create --admin --password "{{item.password}}" "{{item.name}}" "{{item.email}}"'
+  with_items: redash_admin_users
+
+- name: Add regular users
+  shell: '{{redash_manage_script}} users create --password "{{item.password}}" "{{item.name}}" "{{item.email}}"'
+  with_items: redash_users
+
+- name: Delete datasources
+  shell: '{{redash_manage_script}} ds delete {{item}}'
+  with_items: redash_absent_datasources
+
+- name: Add datasources
+  shell: '{{redash_manage_script}} ds new -n "{{item.name}}" -t "{{item.type}}" -o ''{{item.options | to_json}}'''
+  with_items: redash_datasources
+  ignore_errors: yes
+

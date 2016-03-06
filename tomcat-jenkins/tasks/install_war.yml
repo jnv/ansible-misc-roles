@@ -1,0 +1,17 @@
+---
+- name: register jenkins facts
+  set_fact:
+    jenkins_war_path: "{{tomcat_webapps_dir}}/jenkins.war"
+    jenkins_url: "{{tomcat_url}}/jenkins"
+
+- name: download jenkins' war
+  get_url:
+    url: "{{jenkins_war_url}}"
+    dest: "{{jenkins_war_path}}"
+
+- name: verify jenkins war permissions
+  file:
+    path: "{{jenkins_war_path}}"
+    owner: "{{tomcat_owner}}"
+    group: "{{tomcat_group}}"
+    mode: "0664"

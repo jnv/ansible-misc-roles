@@ -1,0 +1,25 @@
+---
+# tasks file for reportserver
+- name: register reportserver facts
+  set_fact:
+    reportserver_dir: "{{tomcat_webapps_dir}}/reportserver"
+    reportserver_url: "{{tomcat_url}}/reportserver"
+    reportserver_owner: "{{tomcat_owner}}"
+    reportserver_group: "{{tomcat_group}}"
+
+- name: check if reportserver is installed
+  stat:
+    path: "{{reportserver_dir}}/installed"
+  register: reportserver_installed
+
+- name: Install ReportServer
+  include: install.yml
+  when: reportserver_installed.stat.exists == False
+
+- name: setup persistence config
+  template:
+    src: persistence.xml.j2
+    dest: "{{reportserver_dir}}/WEB-INF/classes/META-INF/persistence.xml"
+    owner: "{{reportserver_owner}}"
+    group: "{{reportserver_group}}"
+  notify: restart tomcat

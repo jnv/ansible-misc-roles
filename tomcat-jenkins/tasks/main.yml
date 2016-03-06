@@ -1,0 +1,8 @@
+---
+# tasks file for jenkins
+- include: install_war.yml
+
+# - name: check if jenkins is accessible
+#   uri:
+#     url: "{{jenkins_url}}"
+#     status_code: '200,403'

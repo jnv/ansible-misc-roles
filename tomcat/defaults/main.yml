@@ -1,0 +1,45 @@
+---
+tomcat_version: 7
+
+tomcat_roles: ["manager-gui","manager-script"]
+## No tomcat users
+tomcat_users: []
+## Example tomcat users
+# tomcat_users
+#  - { name: "johndoe", password: "changeMe1234", roles: "manager-gui" }
+#  - { name: "automation", password: "changeMe1234", roles: "manager-script" }
+
+tomcat_conf_dir: "/etc/tomcat{{tomcat_version}}"
+tomcat_home_dir: "/usr/share/tomcat{{tomcat_version}}"
+tomcat_webapps_dir: "/var/lib/tomcat{{tomcat_version}}/webapps"
+
+tomcat_port: '8080'
+tomcat_listen_ip: 'localhost'
+
+tomcat_pkg_state: 'present'
+tomcat_service_state: 'started'
+tomcat_service_enabled: 'yes'
+
+tomcat_owner: "tomcat{{tomcat_version}}"
+tomcat_conf_owner: "root"
+tomcat_group: "tomcat{{tomcat_version}}"
+tomcat_groups: ""
+
+tomcat_jmx_enabled: false
+tomcat_jmx_registry_port: 37565
+tomcat_jmx_server_port: 38975
+tomcat_jmx_use_fixed_port: false
+tomcat_jmx_authenticate: true
+tomcat_jmx_bind_id: 127.0.0.1
+## No jmx users
+tomcat_jmx_user: []
+## Example jmx users
+# tomcat_jmx_user:
+#   - { name: "monitorRole", password: "changeMe123456", role: "readonly" }
+#   - { name: "controlRole", password: "changeMePlease123456", role: "readwrite" }
+
+tomcat_java_opts: false
+tomcat_java_opts_file: '/etc/default/tomcat{{tomcat_version}}'
+
+tomcat_initial_memory: "64m"
+tomcat_maximum_memory: "128m"

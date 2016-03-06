@@ -1,0 +1,12 @@
+---
+# defaults file for dashbuilder
+dashbuilder_resource_driver: h2
+dashbuilder_site: dashbuilder
+dashbuilder_pg_driver: false
+dashbuilder_war_url: 'http://downloads.jboss.org/dashbuilder/release/6.1.0.Final/dashbuilder-6.1.0.Final-tomcat-7.war'
+dashbuilder_resource_driver: "h2"
+
+dashbuilder_db_driver: "org.h2.Driver"
+dashbuilder_db_url: "jdbc:h2:~/dashbuilder"
+dashbuilder_db_user: dashbuilder
+dashbuilder_db_password: dashbuilder

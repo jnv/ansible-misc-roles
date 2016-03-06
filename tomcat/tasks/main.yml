@@ -1,0 +1,76 @@
+---
+ # - name: add tomcat_owner user
+ #   tags: user
+ #   user: name={{tomcat_owner}} shell=/bin/false createhome=no
+
+- name: ensure tomcat is installed
+  apt:
+    name: [ "tomcat{{tomcat_version}}", "tomcat{{tomcat_version}}-admin" ]
+    state: "{{tomcat_pkg_state}}"
+
+- name: ensure tomcat is configured
+  template:
+    src: server.xml.j2
+    dest: "{{tomcat_conf_dir}}/server.xml"
+    mode: "u=rw,g=rw,o=r"
+    owner: "{{tomcat_conf_owner}}"
+    group: "{{tomcat_group}}"
+  notify: restart tomcat
+
+- name: set additional groups for tomcat
+  user:
+    name: "{{tomcat_owner}}"
+    groups: "{{tomcat_groups}}"
+    state: present
+  notify: restart tomcat
+
+- name: ensure users and roles are configured
+  template:
+    src: tomcat-users.xml.j2
+    dest: "{{tomcat_conf_dir}}/tomcat-users.xml"
+    mode: "u=rw,g=rw,o=r"
+    owner: "{{tomcat_conf_owner}}"
+    group: "{{tomcat_group}}"
+  notify: restart tomcat
+
+- name: set JAVA_OPTS
+  when: tomcat_java_opts
+  lineinfile:
+    dest: "{{tomcat_java_opts_file}}"
+    regexp: ^JAVA_OPTS=
+    line: 'JAVA_OPTS="{{tomcat_java_opts}}"'
+    state: present
+  notify: restart tomcat
+
+- include: jmx.yml
+  when: "tomcat_jmx_enabled == true"
+
+# - name: ensure tomcat home dir common classes directory is present
+#   file: path={{tomcat_home_dir}}/common/classes/ state=directory mode=0777
+
+# - name: ensure tomcat home dir shared classes directory is present
+#   file: path={{tomcat_home_dir}}/shared/classes/ state=directory mode=0777
+
+# - name: ensure tomcat home dir server classes directory is present
+#   file: path={{tomcat_home_dir}}/server/classes/ state=directory mode=0777
+
+- name: Change ownership of Tomcat installation
+  file: "path={{tomcat_home_dir}} group={{tomcat_group}} mode=g+w state=directory recurse=yes"
+
+# - name: Add ubuntu user to tomcat group
+#   user: name=ubuntu group={{tomcat_group}}
+
+# - name: Add tomcat user to tomcat group and root group
+#   user: name={{tomcat_owner}} group={{tomcat_group}} groups="root"
+
+- name: ensure tomcat service state
+  service: name=tomcat{{tomcat_version}} state={{tomcat_service_state}} enabled={{tomcat_service_enabled}}
+  when: "tomcat_service_state != 'stopped' and tomcat_service_enabled != 'no'"
+
+- name: register tomcat facts
+  set_fact:
+    tomcat_port: "{{tomcat_port}}"
+    tomcat_webapps_dir: "{{tomcat_webapps_dir}}"
+    tomcat_lib_dir: "/var/lib/tomcat{{tomcat_version}}/lib"
+    tomcat_url: "http://localhost:{{tomcat_port}}"
+    tomcat_home: "{{tomcat_home_dir}}"

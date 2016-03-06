@@ -1,0 +1,19 @@
+---
+# defaults file for reportserver
+reportserver_version: 'RS2.2.1-5602'
+reportserver_zip_url: "http://sourceforge.net/projects/dw-rs/files/bin/2.2/{{reportserver_version}}-reportserver.zip/download"
+reportserver_tmp: "/tmp/{{reportserver_version}}.zip"
+reportserver_ddl_file: "reportserver-{{reportserver_version}}-schema-PostgreSQL_CREATE.sql"
+
+
+reportserver_db_dialect: 'org.hibernate.dialect.PostgreSQLDialect'
+                                  # net.datenwerke.rs.utils.hibernate.MySQL5Dialect
+reportserver_db_driver: 'org.postgresql.Driver'
+reportserver_db_name: 'reportserver'
+reportserver_db_user: 'reportserver'
+reportserver_db_password: 'FIXME'
+reportserver_db_url: 'jdbc:postgresql://localhost/{{reportserver_db_name}}'
+reportserver_remove_tmp: true
+
+reportserver_persistence:
+  'hibernate.search.default.directory_provider': ram
