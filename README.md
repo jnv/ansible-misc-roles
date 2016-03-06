@@ -8,6 +8,7 @@ I never got around to properly polish and document these roles and I don't use m
 All roles were created and tested on Ubuntu 14.04 64bit. Currently these roles are included:
 
 * **jenkins** – Derived from [geerlingguy.jenkins](https://github.com/geerlingguy/ansible-role-jenkins)
+* **nodejs** – Install Node.js from Nodesource. Deprecated in favour of [the official role](https://github.com/nodesource/ansible-nodejs-role/)
 * **openjdk** – Just install OpenJDK package.
 * **redash** – Setup [re:dash](https://github.com/getredash/redash) using official tarball. Requires PostgreSQL.
 * **reportserver** – Setup [Reportserver](https://reportserver.net/) under Tomcat with PostgreSQL persistence. Documentation for this product sucks, so I quickly went to something else.
